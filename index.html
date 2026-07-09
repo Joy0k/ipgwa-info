@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>AI기반 C#언어와 IO제어 초급 2차 입과안내</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #1a56db;
+  --primary-light: #3b82f6;
+  --primary-dark: #1e3a8a;
+  --accent: #06b6d4;
+  --accent-warm: #f59e0b;
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --text: #1e293b;
+  --text-secondary: #64748b;
+  --border: #e2e8f0;
+  --shadow: 0 4px 24px rgba(0,0,0,.08);
+  --radius: 12px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.hero {
+  position: relative;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 40%, #1a56db 100%);
+  color: #fff;
+  padding: 40px 28px 32px;
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -60%; right: -20%;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(6,182,212,.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero h1 {
+  font-size: 1.55rem;
+  font-weight: 900;
+  letter-spacing: -.02em;
+  margin-bottom: 16px;
+  position: relative;
+}
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  position: relative;
+}
+.hero-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .85rem;
+  opacity: .9;
+}
+.hero-meta-item svg {
+  width: 16px; height: 16px;
+  fill: #93c5fd;
+  flex-shrink: 0;
+}
+
+.notice-banner {
+  background: linear-gradient(90deg, #fef3c7, #fde68a);
+  color: #92400e;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: .9rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #fbbf24;
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.tab-nav {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  padding: 4px;
+}
+.tab-btn {
+  flex: 1;
+  padding: 10px 8px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.tab-btn.active {
+  background: #fff;
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.tab-btn:hover:not(.active) {
+  background: rgba(255,255,255,.5);
+}
+
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  border-left: 4px solid var(--primary);
+  padding-left: 12px;
+  margin-bottom: 16px;
+}
+
+.pre-check-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pre-check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, #f0f9ff, #eff6ff);
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  transition: box-shadow .2s;
+}
+.pre-check-item:hover {
+  box-shadow: 0 4px 16px rgba(26,86,219,.1);
+}
+.pre-check-icon {
+  width: 36px; height: 36px;
+  background: var(--primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.pre-check-icon svg {
+  width: 20px; height: 20px;
+  fill: #fff;
+}
+.pre-check-body {
+  flex: 1;
+}
+.pre-check-label {
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
+}
+.pre-check-desc {
+  font-size: .8rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 8px 18px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+  text-decoration: none;
+}
+.cta-btn:hover {
+  background: var(--primary-dark);
+}
+
+.overview-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.overview-list li {
+  display: flex;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.overview-label {
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 72px;
+  flex-shrink: 0;
+}
+.overview-value {
+  font-size: .88rem;
+  color: var(--text);
+}
+.sub-note {
+  display: block;
+  font-size: .78rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.goal-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.goal-card {
+  padding: 14px;
+  background: linear-gradient(135deg, #eff6ff, #f0f9ff);
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+}
+.goal-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+.goal-text {
+  font-size: .82rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .82rem;
+  margin-top: 8px;
+}
+.schedule-table th {
+  background: var(--primary);
+  color: #fff;
+  padding: 10px 12px;
+  text-align: center;
+  font-weight: 600;
+  font-size: .8rem;
+}
+.schedule-table th:first-child {
+  border-radius: 8px 0 0 0;
+}
+.schedule-table th:last-child {
+  border-radius: 0 8px 0 0;
+}
+.schedule-table td {
+  padding: 10px 12px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.schedule-table tr:last-child td:first-child {
+  border-radius: 0 0 0 8px;
+}
+.schedule-table tr:last-child td:last-child {
+  border-radius: 0 0 8px 0;
+}
+.time-col {
+  font-weight: 600;
+  color: var(--primary-dark);
+  white-space: nowrap;
+}
+.lunch-row td {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: .82rem;
+  background: #fefce8;
+}
+
+.attendance-block {
+  margin-top: 16px;
+}
+.attendance-block + .attendance-block {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--border);
+}
+.att-block-title {
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.att-block-title .tag {
+  font-size: .7rem;
+  font-weight: 600;
+  background: #dbeafe;
+  color: var(--primary);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.att-list {
+  list-style: none;
+  margin-left: 4px;
+}
+.att-list li {
+  position: relative;
+  padding: 4px 0 4px 18px;
+  font-size: .88rem;
+  color: var(--text);
+}
+.att-list li::before {
+  content: '\2713';
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+}
+
+.guide-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .82rem;
+  margin-top: 12px;
+}
+.guide-table th {
+  background: #f1f5f9;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 700;
+  color: var(--primary-dark);
+  border-bottom: 2px solid var(--primary-light);
+}
+.guide-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.guide-table ul {
+  list-style: none;
+  padding: 0;
+}
+.guide-table li {
+  position: relative;
+  padding: 2px 0 2px 16px;
+  font-size: .8rem;
+}
+.guide-table li::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 9px;
+  width: 5px; height: 5px;
+  background: var(--primary-light);
+  border-radius: 50%;
+}
+
+@media (max-width: 640px) {
+  .hero h1 { font-size: 1.2rem; }
+  .hero-meta { flex-direction: column; gap: 6px; }
+  .tab-btn { font-size: .72rem; padding: 8px 4px; }
+  .card { padding: 16px; }
+  .goal-cards { grid-template-columns: 1fr; }
+  .schedule-table { font-size: .75rem; }
+  .schedule-table th, .schedule-table td { padding: 8px 6px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="hero">
+    <h1>AI기반 C#언어와 IO제어 초급 2차<br>입과안내</h1>
+    <div class="hero-meta">
+      <span class="hero-meta-item">
+        <svg viewBox="0 0 16 16"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm.5 4.75a.75.75 0 0 1-1.5 0 .75.75 0 0 1 1.5 0zm1 6.25H7v-1h.5V8H7V7h1.5v2.5H9.5v1z"/></svg>
+        5/12(화) ~ 5/14(목)
+      </span>
+      <span class="hero-meta-item">
+        <svg viewBox="0 0 16 16"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm1 3H7v5h2V3zm0 6H7v2h2V9z"/></svg>
+        수원사업장 B3건물 2층 203호
+      </span>
+      <span class="hero-meta-item">
+        <svg viewBox="0 0 16 16"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm.5 4.75a.75.75 0 0 1-1.5 0 .75.75 0 0 1 1.5 0zm1 6.25H7v-1h.5V8H7V7h1.5v2.5H9.5v1z"/></svg>
+        08:00 ~ 17:00
+      </span>
+    </div>
+  </header>
+
+  <div class="notice-banner">
+    ⚠️ 입과안내문 필히 숙지하시어 준비 부탁드립니다
+  </div>
+
+  <nav class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('precheck')">📋 사전 필수 준비사항</button>
+    <button class="tab-btn" onclick="switchTab('overview')">📚 교육 개요</button>
+    <button class="tab-btn" onclick="switchTab('schedule')">📅 일정표</button>
+    <button class="tab-btn" onclick="switchTab('attendance')">📋 근태·출장 안내</button>
+  </nav>
+
+  <section id="precheck" class="tab-content card active">
+    <h2 class="section-title">사전 필수 준비사항</h2>
+    <ul class="pre-check-list">
+      <li class="pre-check-item">
+        <div class="pre-check-icon">
+          <svg viewBox="0 0 16 16"><path d="M1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0zM8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm-.75 4.75a.75.75 0 0 0 1.5 0 .75.75 0 0 0-1.5 0zM9 6H7v5h2V6zm0 6H7v1h2v-1z"/></svg>
+        </div>
+        <div class="pre-check-body">
+          <div class="pre-check-label">과정 입과동의서 서약 필수</div>
+          <div class="pre-check-desc">입과 전 동의서 작성 필수 (미작성 시 입과 불가)</div>
+          <a href="#" class="cta-btn">포기서 작성하기</a>
+        </div>
+      </li>
+      <li class="pre-check-item">
+        <div class="pre-check-icon">
+          <svg viewBox="0 0 16 16"><path d="M11.5 8a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0zm1.5 0a5 5 0 1 1-10 0 5 5 0 0 1 10 0zm-7 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0z"/></svg>
+        </div>
+        <div class="pre-check-body">
+          <div class="pre-check-label">노동부 앱 사전설치 (본인인증 필수)</div>
+          <div class="pre-check-desc">교육 수강 시 필수적으로 사전에 설치 및 본인인증 필수</div>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <section id="overview" class="tab-content card">
+    <h2 class="section-title">교육 개요</h2>
+    <ul class="overview-list">
+      <li>
+        <span class="overview-label">과정명</span>
+        <span class="overview-value">AI기반 C#언어와 IO제어 초급 2차</span>
+      </li>
+      <li>
+        <span class="overview-label">일정</span>
+        <span class="overview-value">
+          5/12(화) ~ 5/14(목), 08:00 ~ 17:00
+          <span class="sub-note">※ 5/12(화) 09:30 ~ 17:00</span>
+        </span>
+      </li>
+      <li>
+        <span class="overview-label">장소</span>
+        <span class="overview-value">수원사업장 B3건물 2층 203호 교육장</span>
+      </li>
+      <li>
+        <span class="overview-label">수료기준</span>
+        <span class="overview-value">출석률, 실습평가 70점 이상</span>
+      </li>
+    </ul>
+
+    <h3 style="margin-top:20px;font-size:1rem;font-weight:700;color:var(--primary-dark);">🎯 교육 목표</h3>
+    <div class="goal-cards">
+      <div class="goal-card">
+        <div class="goal-num">01</div>
+        <div class="goal-text">C#언어의 기본 문법과 절차지향 프로그래밍 개념 이해</div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-num">02</div>
+        <div class="goal-text">변수, 자료형, 연산자 활용과 제어문 실습</div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-num">03</div>
+        <div class="goal-text">배열과 리스트 구조를 통한 데이터 관리</div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-num">04</div>
+        <div class="goal-text">객체지향 프로그래밍 기본 개념과 클래스 구현</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="schedule" class="tab-content card">
+    <h2 class="section-title">일정표</h2>
+    <table class="schedule-table">
+      <thead>
+        <tr>
+          <th>시간</th>
+          <th>5/12(화)</th>
+          <th>5/13(수)</th>
+          <th>5/14(목)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="time-col">08:00~09:30</td>
+          <td>-</td>
+          <td>오전 교육</td>
+          <td>오전 교육</td>
+        </tr>
+        <tr>
+          <td class="time-col">09:30~12:00</td>
+          <td>오전 교육</td>
+          <td>오전 교육</td>
+          <td>오전 교육</td>
+        </tr>
+        <tr class="lunch-row">
+          <td>12:00~13:00</td>
+          <td colspan="3">한식 (중식 제공)</td>
+        </tr>
+        <tr>
+          <td class="time-col">13:00~17:00</td>
+          <td>오후 교육</td>
+          <td>오후 교육</td>
+          <td>오후 교육</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="attendance" class="tab-content card">
+    <h2 class="section-title">근태·출장 안내</h2>
+
+    <div class="attendance-block">
+      <div class="att-block-title">
+        수원사업장 <span class="tag">교육 근태</span>
+      </div>
+      <ul class="att-list">
+        <li>근태 시스템에서 "교육" 근태 입력 필수</li>
+        <li>카드 번호 없이 "교육" 검색 후 입력</li>
+      </ul>
+    </div>
+
+    <div class="attendance-block">
+      <div class="att-block-title">
+        부산/세종사업장 <span class="tag">출장 시스템</span>
+      </div>
+      <ul class="att-list">
+        <li>출장 시스템에서 신청 필수</li>
+        <li>카드 번호 없이 검색 후 신청</li>
+      </ul>
+    </div>
+
+    <table class="guide-table">
+      <thead>
+        <tr>
+          <th>항목</th>
+          <th>내용</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>출장 목적/유형</td>
+          <td>교육 수강</td>
+        </tr>
+        <tr>
+          <td>출장 기간</td>
+          <td>5/12(화) ~ 5/14(목)</td>
+        </tr>
+        <tr>
+          <td>비근무일수</td>
+          <td>
+            <ul>
+              <li>ex) 교육 전일</li>
+              <li>ex) 교육 전일</li>
+              <li>ex) 교육 전일</li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<script>
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
