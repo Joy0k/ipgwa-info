@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>PLC응용(Motion) 입과안내</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #1a56db;
+  --primary-light: #3b82f6;
+  --primary-dark: #1e3a8a;
+  --accent: #06b6d4;
+  --accent-warm: #f59e0b;
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --text: #1e293b;
+  --text-secondary: #64748b;
+  --border: #e2e8f0;
+  --shadow: 0 4px 24px rgba(0,0,0,.08);
+  --radius: 12px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.hero {
+  position: relative;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 40%, #1a56db 100%);
+  color: #fff;
+  padding: 40px 28px 32px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(26,86,219,.25);
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -40%; right: -20%;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(6,182,212,.25) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -30%; left: -10%;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(245,158,11,.12) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-block;
+  background: rgba(6,182,212,.2);
+  border: 1px solid rgba(6,182,212,.4);
+  color: #67e8f9;
+  font-size: .75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  letter-spacing: .5px;
+}
+.hero-title {
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  line-height: 1.3;
+  position: relative;
+  z-index: 1;
+}
+.hero-title span {
+  color: var(--accent);
+}
+.hero-sub {
+  margin-top: 10px;
+  font-size: .9rem;
+  color: rgba(255,255,255,.7);
+  position: relative;
+  z-index: 1;
+}
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 20px;
+  position: relative;
+  z-index: 1;
+}
+.hero-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .85rem;
+  color: rgba(255,255,255,.85);
+}
+.hero-meta-item svg {
+  width: 16px; height: 16px;
+  fill: var(--accent);
+  flex-shrink: 0;
+}
+
+.notice {
+  background: linear-gradient(90deg, #fef3c7, #fde68a);
+  border-left: 4px solid var(--accent-warm);
+  padding: 12px 16px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin-top: 16px;
+  font-size: .85rem;
+  color: #92400e;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.notice svg {
+  width: 18px; height: 18px;
+  fill: #d97706;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.tab-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+.tab-btn {
+  flex: 1;
+  min-width: 140px;
+  background: var(--card);
+  border: 2px solid var(--border);
+  color: var(--text-secondary);
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: .85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all .25s ease;
+}
+.tab-btn:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+  background: #eff6ff;
+}
+.tab-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(26,86,219,.3);
+}
+.tab-btn svg {
+  width: 16px; height: 16px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.tab-content {
+  display: none;
+  animation: fadeSlide .35s ease;
+}
+.tab-content.active { display: block; }
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  margin-top: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  border-left: 4px solid var(--primary);
+  padding-left: 12px;
+  margin-bottom: 16px;
+}
+
+.pre-check-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pre-check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, #f0f9ff, #eff6ff);
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  transition: box-shadow .2s;
+}
+.pre-check-item:hover {
+  box-shadow: 0 4px 16px rgba(26,86,219,.1);
+}
+.pre-check-icon {
+  width: 36px; height: 36px;
+  background: var(--primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.pre-check-icon svg {
+  width: 20px; height: 20px;
+  fill: #fff;
+}
+.pre-check-body {
+  flex: 1;
+}
+.pre-check-label {
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
+}
+.pre-check-desc {
+  font-size: .8rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.pre-check-action {
+  margin-top: 8px;
+}
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: .82rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-action:hover {
+  background: var(--primary-dark);
+  box-shadow: 0 4px 12px rgba(26,86,219,.3);
+}
+.btn-action svg {
+  width: 14px; height: 14px;
+  fill: currentColor;
+}
+.btn-action.disabled {
+  background: #94a3b8;
+  cursor: default;
+  pointer-events: none;
+}
+
+.overview-list {
+  list-style: none;
+}
+.overview-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+}
+.overview-list li:last-child { border-bottom: none; }
+.overview-label {
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 80px;
+  flex-shrink: 0;
+}
+.overview-value {
+  color: var(--text);
+}
+.overview-value .sub-note {
+  display: block;
+  font-size: .8rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.goal-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.goal-card {
+  background: linear-gradient(135deg, #eff6ff, #f0f9ff);
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.goal-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: var(--primary);
+}
+.goal-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: #dbeafe;
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+.goal-text {
+  font-size: .88rem;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin-top: 8px;
+}
+.schedule-table th,
+.schedule-table td {
+  padding: 12px 14px;
+  text-align: left;
+  font-size: .85rem;
+  border-bottom: 1px solid var(--border);
+}
+.schedule-table thead th {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  text-align: center;
+  padding: 10px;
+}
+.schedule-table thead th:first-child {
+  background: var(--primary-dark);
+}
+.schedule-table tbody th {
+  background: #f8fafc;
+  color: var(--primary-dark);
+  font-weight: 600;
+  text-align: center;
+  width: 70px;
+}
+.schedule-table td {
+  vertical-align: top;
+  line-height: 1.8;
+}
+.schedule-table td .topic {
+  display: block;
+  position: relative;
+  padding-left: 12px;
+}
+.schedule-table td .topic::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 9px;
+  width: 5px; height: 5px;
+  background: var(--primary-light);
+  border-radius: 50%;
+}
+.lunch-row td {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: .82rem;
+  background: #fefce8;
+}
+
+.attendance-block {
+  margin-top: 16px;
+}
+.attendance-block + .attendance-block {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--border);
+}
+.att-block-title {
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.att-block-title .tag {
+  font-size: .7rem;
+  font-weight: 600;
+  background: #dbeafe;
+  color: var(--primary);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.att-list {
+  list-style: none;
+  margin-left: 4px;
+}
+.att-list li {
+  position: relative;
+  padding: 4px 0 4px 18px;
+  font-size: .88rem;
+  color: var(--text);
+}
+.att-list li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: .8rem;
+}
+.att-list li .highlight {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.guide-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin-top: 12px;
+}
+.guide-table th,
+.guide-table td {
+  padding: 10px 14px;
+  font-size: .85rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.guide-table th {
+  background: #f8fafc;
+  color: var(--primary-dark);
+  font-weight: 600;
+  width: 130px;
+}
+.guide-table td {
+  color: var(--text);
+}
+.guide-table .note {
+  font-size: .78rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 24px;
+  padding: 16px;
+  font-size: .75rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 640px) {
+  .hero { padding: 28px 18px 24px; }
+  .hero-title { font-size: 1.35rem; }
+  .hero-meta { flex-direction: column; gap: 8px; }
+  .tab-nav { flex-direction: column; }
+  .tab-btn { min-width: unset; }
+  .goal-cards { grid-template-columns: 1fr; }
+  .schedule-table th,
+  .schedule-table td { padding: 8px 10px; font-size: .78rem; }
+  .card { padding: 18px; }
+  .pre-check-item { flex-direction: column; gap: 10px; }
+  .pre-check-icon { width: 32px; height: 32px; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <header class="hero">
+    <div class="hero-badge">📋 입과안내</div>
+    <h1 class="hero-title">PLC응용<br><span>(Motion)</span></h1>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm0 16H5V8h14v11z"/></svg>
+        7/27(월) ~ 7/29(수)
+      </div>
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>
+        천안 한국기술교육대학교 제2캠퍼스 804호
+      </div>
+      <div class="hero-meta-item">
+        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+        8:30 ~ 17:20
+      </div>
+    </div>
+  </header>
+
+  <div class="notice">
+    <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+    <span>입과안내문 필힌 숙지하시어 준비 부탁드립니다</span>
+  </div>
+
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-target="pre">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      사전 필수 준비사항
+    </button>
+    <button class="tab-btn" data-target="overview">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+      교육 개요
+    </button>
+    <button class="tab-btn" data-target="schedule">
+      <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+      일정표
+    </button>
+    <button class="tab-btn" data-target="attendance">
+      <svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-7 0a1 1 0 110 2 1 1 0 010-2zm0 4a3.5 3.5 0 110 7 3.5 3.5 0 010-7z"/></svg>
+      근태·출장 안내
+    </button>
+  </nav>
+
+  <main>
+
+    <section id="pre" class="tab-content active card">
+      <h2 class="section-title">사전 필수 준비사항</h2>
+      <ul class="pre-check-list">
+        <li class="pre-check-item">
+          <div class="pre-check-icon">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v7h7v9H6zm2-6h8v2H8v-2zm0 4h5v2H8v-2zm0-8h3v2H8v-2z"/></svg>
+          </div>
+          <div class="pre-check-body">
+            <div class="pre-check-label">과정 입과동의서 서약</div>
+            <div class="pre-check-desc">교육 플랫폼에서 입과동의서 작성이 필요합니다.</div>
+            <div class="pre-check-action">
+              <a href="https://platform.samsungcic.com/#/course/CRS20260211267868448" id="consentLink" class="btn-action" target="_blank">
+                <svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                동의서 작성하기
+              </a>
+            </div>
+          </div>
+        </li>
+        <li class="pre-check-item">
+          <div class="pre-check-icon">
+            <svg viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14zm-4.2-5.78v1.75l3.2-2.99L12.8 9v1.7c-3.11.43-4.35 2.56-4.8 4.7 1.11-1.55 2.59-2.18 4.8-2.18z"/></svg>
+          </div>
+          <div class="pre-check-body">
+            <div class="pre-check-label">노동부 앱 사전설치</div>
+            <div class="pre-check-desc">본인인증이 필수이므로 사전에 아래 순서에 따라 완료해 주세요.</div>
+            <div style="margin-top:8px;font-size:.82rem;color:var(--text);line-height:1.9;padding-left:4px;">
+              ① '고용24 직업퟈련 출결관리' 앱 설치<br>
+              ② 회원 가입<br>
+              ③ 실명 인증<br>
+              ④ 기기 등록
+            </div>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section id="overview" class="tab-content card">
+      <h2 class="section-title">교육 개요</h2>
+      <ul class="overview-list">
+        <li>
+          <span class="overview-label">과정명</span>
+          <span class="overview-value">PLC응용(Motion)</span>
+        </li>
+        <li>
+          <span class="overview-label">일정</span>
+          <span class="overview-value">
+            7/27(월) ~ 7/29(수), 8:30 ~ 17:20
+            <span class="sub-note">※ 7/27(월) 09:00 ~ 17:50</span>
+            <span class="sub-note">※ 7/29(수) 08:30 ~ 16:20</span>
+          </span>
+        </li>
+        <li>
+          <span class="overview-label">장소</span>
+          <span class="overview-value">천안 한국기술교육대학교 제2캠퍼스 804호 강의장</span>
+        </li>
+        <li>
+          <span class="overview-label">수료기준</span>
+          <span class="overview-value">출석율, 실습평가 70점 이상</span>
+        </li>
+      </ul>
+
+      <h3 style="margin-top:20px;font-size:1rem;font-weight:700;color:var(--primary-dark);">🎯 교육 목표</h3>
+      <div class="goal-cards">
+        <div class="goal-card">
+          <div class="goal-num">01</div>
+          <div class="goal-text">서보 모터/드라이브 제어기의 구성 및 원리 이해</div>
+        </div>
+        <div class="goal-card">
+          <div class="goal-num">02</div>
+          <div class="goal-text">모션 제어 기법(보간, 위치결정) 습득</div>
+        </div>
+        <div class="goal-card">
+          <div class="goal-num">03</div>
+          <div class="goal-text">2축 서보 모터의 위치결정제어 실습</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="schedule" class="tab-content card">
+      <h2 class="section-title">일정표</h2>
+      <table class="schedule-table">
+        <thead>
+          <tr>
+            <th>구분</th>
+            <th>7/27(월)</th>
+            <th>7/28(화)</th>
+            <th>7/29(수)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>오전</th>
+            <td>
+              <span class="topic">PLC제어 기본 구조</span>
+              <span class="topic">위치결정 모듈 기본</span>
+              <span class="topic">서보시스템 기본 구성</span>
+              <span class="topic">HMI와 PLC연동 구조 이해</span>
+            </td>
+            <td>
+              <span class="topic">축 제어 개념</span>
+              <span class="topic">2축 직선 보간 실습</span>
+              <span class="topic">2축 원호 보간 실습</span>
+              <span class="topic">보간/단축 운전 비교</span>
+            </td>
+            <td>
+              <span class="topic">유지보수 관점 이해</span>
+              <span class="topic">설비 분석&수정 실습</span>
+              <span class="topic">추가 모터 제어 방법</span>
+            </td>
+          </tr>
+          <tr class="lunch-row">
+            <th>중식</th>
+            <td colspan="3">12:00 ~ 13:00</td>
+          </tr>
+          <tr>
+            <th>오후</th>
+            <td>
+              <span class="topic">절대 위치제어 실습</span>
+              <span class="topic">단축 위치결정제어 실습</span>
+              <span class="topic">조그 운전 및 비상정지</span>
+              <span class="topic">프로그램 작성 실습</span>
+            </td>
+            <td>
+              <span class="topic">연속 제어 개념</span>
+              <span class="topic">연속 제어 실습</span>
+              <span class="topic">운전 중 파라미터 변경</span>
+              <span class="topic">HMI-PLC 통신 심화</span>
+            </td>
+            <td>
+              <span class="topic">인버터/아날로그 연계</span>
+              <span class="topic">시스템 통합 동작 확인</span>
+              <span class="topic">종합실습 / 평가</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="attendance" class="tab-content card">
+      <h2 class="section-title">근태·출장 안내</h2>
+
+      <div class="attendance-block">
+        <div class="att-block-title">
+          G-BTS 출장 신청 <span class="tag">출장시스템</span>
+        </div>
+        <ul class="att-list">
+          <li><strong>G-BTS 출장시스템</strong>에서 신청</li>
+          <li>출장 신청 시 <strong>HR Partner 근태 자동 반영</strong>됨</li>
+          <li><span class="highlight">※</span> 출장비 지급 규정에 의거하여 <strong>"사내교육(합숙)은 일당 미지급"</strong><br>&nbsp;&nbsp;&nbsp;(주관처가 사내 → 사내교육, 주관처에서 숙박 제공 → 합숙)</li>
+        </ul>
+
+        <h3 style="margin-top:16px;font-size:.95rem;font-weight:700;color:var(--primary-dark);">📝 출장 신청 Guide</h3>
+        <table class="guide-table">
+          <thead>
+            <tr>
+              <th>항목</th>
+              <th>작성 예시</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>출장 목적/유형</td>
+              <td>[교육] 사내교육(합숙), 국내</td>
+            </tr>
+            <tr>
+              <td>출장 기간</td>
+              <td>
+                [당일 이동] 7.27 ~ 29 (3일간)
+                <br>[전일 이동] 7.26 ~ 29 (4일간)
+                <div class="note">* 단, 7.26은 비근무일수 체크</div>
+              </td>
+            </tr>
+            <tr>
+              <td>비근무일수</td>
+              <td>
+                교육일이 아닌 일정에 이동하는 경우 체크
+                <div class="note">* ex) 교육 전일</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="footer">PLC응용(Motion) · 입과안내</div>
+
+</div>
+
+<script>
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn.active')
+      .forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-content.active')
+      .forEach(el => el.classList.remove('active'));
+
+    btn.classList.add('active');
+    const target = document.getElementById(btn.dataset.target);
+    if (target) target.classList.add('active');
+  });
+});
+</script>
+</body>
+                </html>
