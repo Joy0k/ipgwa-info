@@ -349,57 +349,40 @@ body {
   font-size: .78rem;
   font-weight: 600;
 }
-.day-body { padding: 0; }
-.time-block {
-  display: flex;
-  border-bottom: 1px solid var(--border);
-}
-.time-block:last-child { border-bottom: none; }
-.time-label {
-  width: 42px;
-  flex-shrink: 0;
-  background: #f8fafc;
-  color: var(--primary-dark);
-  font-size: .68rem;
+.day-body { padding: 8px 12px; }
+.day-topics .topic-main {
+  display: block;
+  font-size: .76rem;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 8px 4px;
-  border-right: 1px solid var(--border);
+  color: var(--text);
+  line-height: 1.6;
+  position: relative;
+  padding-left: 14px;
+  margin-top: 6px;
 }
-.time-label.lunch {
-  background: #fefce8;
-  color: var(--text-sec);
-  font-size: .62rem;
+.day-topics .topic-main:first-child { margin-top: 0; }
+.day-topics .topic-main::before {
+  content: '—';
+  position: absolute;
+  left: 0; top: 0;
+  color: var(--primary);
+  font-weight: 700;
 }
-.time-topics {
-  flex: 1;
-  padding: 8px 10px;
-}
-.time-topics .topic {
+.day-topics .topic-sub {
   display: block;
   font-size: .72rem;
   color: var(--text);
   line-height: 1.6;
   position: relative;
-  padding-left: 10px;
+  padding-left: 22px;
 }
-.time-topics .topic::before {
-  content: '';
+.day-topics .topic-sub::before {
+  content: '·';
   position: absolute;
-  left: 0; top: 7px;
-  width: 4px; height: 4px;
-  background: var(--primary-light);
-  border-radius: 50%;
-}
-.lunch-text {
-  font-size: .68rem;
+  left: 12px; top: -1px;
   color: var(--text-sec);
-  text-align: center;
-  padding: 6px;
-  background: #fefce8;
+  font-weight: 700;
+  font-size: .85rem;
 }
 
 /* ── Attendance ── */
@@ -646,26 +629,14 @@ body {
         <div class="day-card">
           <div class="day-header">10/21 (수) · 09:00 ~ 17:00</div>
           <div class="day-body">
-            <div class="time-block">
-              <div class="time-label">오전</div>
-              <div class="time-topics">
-                <span class="topic">PLC개요 및 구성요소</span>
-                <span class="topic">액추에이터 및 주변기기 동작 이해</span>
-                <span class="topic">설비의 입/출력기기 동작 원리 학습</span>
-                <span class="topic">프로그램 S/W 이해</span>
-                <span class="topic">래더 회로 원리 이해</span>
-              </div>
-            </div>
-            <div class="time-block">
-              <div class="time-label lunch">중식</div>
-              <div class="lunch-text">12:00 ~ 13:00</div>
-            </div>
-            <div class="time-block">
-              <div class="time-label">오후</div>
-              <div class="time-topics">
-                <span class="topic">기본 명령어의 이해</span>
-                <span class="topic">기본 명령어 프로그램 실습</span>
-              </div>
+            <div class="day-topics">
+              <span class="topic-main">PLC개요 및 구성요소</span>
+              <span class="topic-sub">액추에이터 및 주변기기 동작 이해</span>
+              <span class="topic-sub">설비의 입/출력기기 동작 원리 학습</span>
+              <span class="topic-main">프로그램 S/W 이해</span>
+              <span class="topic-sub">래더 회로 원리 이해</span>
+              <span class="topic-sub">기본 명령어의 이해</span>
+              <span class="topic-sub">기본 명령어 프로그램 실습</span>
             </div>
           </div>
         </div>
@@ -674,25 +645,13 @@ body {
         <div class="day-card">
           <div class="day-header">10/22 (목) · 08:00 ~ 17:00</div>
           <div class="day-body">
-            <div class="time-block">
-              <div class="time-label">오전</div>
-              <div class="time-topics">
-                <span class="topic">프로그램 실습</span>
-                <span class="topic">자기유지, 타이머</span>
-                <span class="topic">실린더 제어의 이해</span>
-                <span class="topic">DC 모터 제어의 이해</span>
-              </div>
-            </div>
-            <div class="time-block">
-              <div class="time-label lunch">중식</div>
-              <div class="lunch-text">12:00 ~ 13:00</div>
-            </div>
-            <div class="time-block">
-              <div class="time-label">오후</div>
-              <div class="time-topics">
-                <span class="topic">단동/복동 Sol 이해</span>
-                <span class="topic">실린더+컨베이어 모터</span>
-              </div>
+            <div class="day-topics">
+              <span class="topic-main">프로그램 실습</span>
+              <span class="topic-sub">자기유지, 타이머</span>
+              <span class="topic-sub">실린더 제어의 이해</span>
+              <span class="topic-sub">DC 모터 제어의 이해</span>
+              <span class="topic-sub">단동/복동 Sol 이해</span>
+              <span class="topic-sub">실린더+컨베이어 모터</span>
             </div>
           </div>
         </div>
@@ -701,23 +660,11 @@ body {
         <div class="day-card">
           <div class="day-header">10/23 (금) · 08:00 ~ 17:00</div>
           <div class="day-body">
-            <div class="time-block">
-              <div class="time-label">오전</div>
-              <div class="time-topics">
-                <span class="topic">프로그램 실습</span>
-                <span class="topic">P&P Unit 제어</span>
-                <span class="topic">응용 시퀀스 프로그램 제어</span>
-              </div>
-            </div>
-            <div class="time-block">
-              <div class="time-label lunch">중식</div>
-              <div class="lunch-text">12:00 ~ 13:00</div>
-            </div>
-            <div class="time-block">
-              <div class="time-label">오후</div>
-              <div class="time-topics">
-                <span class="topic">실습 평가</span>
-              </div>
+            <div class="day-topics">
+              <span class="topic-main">프로그램 실습</span>
+              <span class="topic-sub">P&P Unit 제어</span>
+              <span class="topic-sub">응용 시퀀스 프로그램 제어</span>
+              <span class="topic-sub">실습 평가</span>
             </div>
           </div>
         </div>
